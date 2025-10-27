@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[Your Name] Portfolio</title>
+  <link href="output.css" rel="stylesheet">
+  <style>
+    /* ========== GLOBAL STYLES ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      overflow: hidden;
+      cursor: none;
+      background: #000000;
+    }
+
+    /* Show default cursor on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      html, body {
+        cursor: auto;
+      }
+    }
+
+    /* ========== GLASSMORPHISM UTILITY ========== */
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+    }
+
+    /* Fallback for browsers without backdrop-filter support */
+    @supports not (backdrop-filter: blur(15px)) {
+      .glass {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    /* ========== SECTION POSITIONING & TRANSITIONS ========== */
+    .section {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 1;
+    }
+
+    .section.active {
+      transform: translateY(0);
+    }
+
+    .section.above {
+      transform: translateY(-100%);
+    }
+
+    .section.below {
+      transform: translateY(100%);
+    }
+
+    /* ========== GLITCH ANIMATION ========== */
+    @keyframes glitch {
+      0%, 100% {
+        text-shadow: 0 0 0 rgba(255, 0, 0, 0);
+      }
+      10% {
+        text-shadow: -3px 0 0 rgba(255, 0, 0, 0.8), 3px 0 0 rgba(0, 255, 255, 0.8);
+      }
+      20% {
+        text-shadow: 3px 0 0 rgba(255, 0, 0, 0.8), -3px 0 0 rgba(0, 255, 255, 0.8);
+      }
+      30% {
+        text-shadow: -3px 0 0 rgba(255, 0, 0, 0.8), 3px 0 0 rgba(0, 255, 255, 0.8);
+      }
+      40%, 100% {
+        text-shadow: 0 0 0 rgba(255, 0, 0, 0);
+      }
+    }
+
+    .glitch {
+      animation: glitch 1s ease-in-out;
+    }
+
+    /* ========== POP ANIMATION ========== */
+    @keyframes pop {
+      0% {
+        transform: translateX(-20px) scale(0.8);
+        opacity: 0;
+      }
+      60% {
+        transform: translateX(5px) scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* ========== CUSTOM BLOB CURSOR ========== */
+    #custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100px;
+      height: 100px;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      #custom-cursor {
+        display: block;
+      }
+    }
+
+    /* ========== GEAR MENU ========== */
+    #gear-menu {
+      position: fixed;
+      top: 40px;
+      left: 40px;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 767px) {
+      #gear-menu {
+        top: auto;
+        bottom: 30px;
+        left: 30px;
+      }
+    }
+
+    .gear-icon {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    }
+
+    .gear-icon.spinning {
+      transform: rotate(360deg);
+    }
+
+    .gear-links {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .gear-links.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .gear-link {
+      position: absolute;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    .gear-links.active .gear-link {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .gear-link:nth-child(1) { animation-delay: 0s; }
+    .gear-link:nth-child(2) { animation-delay: 0.05s; }
+    .gear-link:nth-child(3) { animation-delay: 0.1s; }
+    .gear-link:nth-child(4) { animation-delay: 0.15s; }
+    .gear-link:nth-child(5) { animation-delay: 0.2s; }
+    .gear-link:nth-child(6) { animation-delay: 0.25s; }
+
+    .gear-links.active .gear-link {
+      animation: popIn 0.4s ease forwards;
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      70% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .gear-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
+
+    .gear-link.active-section {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ========== SCROLL INDICATOR ========== */
+    #scroll-indicator {
+      position: fixed;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (max-width: 767px) {
+      #scroll-indicator {
+        right: auto;
+        left: auto;
+        right: 30px;
+        bottom: 30px;
+        top: auto;
+        transform: none;
+        flex-direction: row;
+        gap: 10px;
+      }
+    }
+
+    .scroll-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .scroll-dot:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.2);
+    }
+
+    .scroll-dot.active {
+      width: auto;
+      min-width: 100px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      animation: pop 0.5s ease;
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 767px) {
+      .scroll-dot.active {
+        min-width: 60px;
+        font-size: 10px;
+        padding: 6px 10px;
+      }
+    }
+
+    /* ========== SKILL METERS ========== */
+    .skill-bar-fill {
+      width: 0;
+      transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .skill-bar-fill.animated {
+      width: var(--target-width);
+    }
+
+    .circular-progress {
+      transform: rotate(-90deg);
+    }
+
+    .circular-progress-ring {
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .circular-progress-ring.animated {
+      stroke-dashoffset: var(--target-offset);
+    }
+
+    /* ========== PROJECT CAROUSEL ========== */
+    .project-card {
+      transition: all 0.6s ease-in-out;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .project-card.slide-out-left {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+
+    .project-card.slide-in-right {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .project-card.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ========== RESPONSIVE MOBILE BLUR OPTIMIZATION ========== */
+    @media (max-width: 767px) {
+      .glass {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+    }
+  </style>
+</head>
+<body class="bg-black text-white">
+
+  <!-- ========== SVG FILTERS FOR BLOB CURSOR ========== -->
+  <svg style="position: absolute; width: 0; height: 0;">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="
+          1 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          0 0 0 18 -7" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- ========== CUSTOM BLOB CURSOR ========== -->
+  <div id="custom-cursor">
+    <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" style="filter: url(#goo);">
+      <circle cx="50" cy="50" r="20" fill="#ff0000" opacity="0.8"/>
+      <circle cx="45" cy="48" r="15" fill="#ff0000" opacity="0.6"/>
+      <circle cx="55" cy="52" r="12" fill="#ff0000" opacity="0.7"/>
+    </svg>
+  </div>
+
+  <!-- ========== LEFT GEAR MENU ========== -->
+  <nav id="gear-menu">
+    <svg class="gear-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <div class="gear-links">
+      <div class="gear-link glass text-white text-sm font-medium" data-section="0" style="top: -60px; left: 70px;">Hero</div>
+      <div class="gear-link glass text-white text-sm font-medium" data-section="1" style="top: -40px; left: 120px;">About</div>
+      <div class="gear-link glass text-white text-sm font-medium" data-section="2" style="top: 0px; left: 140px;">Skills</div>
+      <div class="gear-link glass text-white text-sm font-medium" data-section="3" style="top: 40px; left: 120px;">Experience</div>
+      <div class="gear-link glass text-white text-sm font-medium" data-section="4" style="top: 60px; left: 70px;">Projects</div>
+      <div class="gear-link glass text-white text-sm font-medium" data-section="5" style="top: 70px; left: 0px;">Contact</div>
+    </div>
+  </nav>
+
+  <!-- ========== RIGHT SCROLL INDICATOR ========== -->
+  <nav id="scroll-indicator">
+    <div class="scroll-dot active text-white text-xs flex items-center justify-center" data-section="0">Hero</div>
+    <div class="scroll-dot text-white text-xs flex items-center justify-center" data-section="1">About</div>
+    <div class="scroll-dot text-white text-xs flex items-center justify-center" data-section="2">Skills</div>
+    <div class="scroll-dot text-white text-xs flex items-center justify-center" data-section="3">Work</div>
+    <div class="scroll-dot text-white text-xs flex items-center justify-center" data-section="4">Projects</div>
+    <div class="scroll-dot text-white text-xs flex items-center justify-center" data-section="5">Contact</div>
+  </nav>
+
+  <!-- ========== SECTION 1: HERO ========== -->
+  <section id="hero" class="section active" data-index="0">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-4xl mx-4 text-center">
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-4">
+        [YOURNAME]<span class="dev text-red-600">.DEV</span>
+      </h1>
+      <p class="text-xl md:text-2xl lg:text-3xl text-gray-300 mb-6">[Your Title]</p>
+      <p class="text-base md:text-lg text-gray-400">[Your Tagline]</p>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 2: ABOUT ========== -->
+  <section id="about" class="section below" data-index="1">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-3xl mx-4">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">About Me</h2>
+      <div class="space-y-4 text-gray-300 text-sm md:text-base lg:text-lg">
+        <p>[Your bio paragraph 1 - Introduce yourself, your background, and what drives your passion for game development and technical work.]</p>
+        <p>[Your bio paragraph 2 - Discuss your experience, key skills, and what makes your approach unique in the field.]</p>
+        <p>[Your bio paragraph 3 - Share your interests, goals, and what you're currently working on or learning.]</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 3: SKILLS ========== -->
+  <section id="skills" class="section below" data-index="2">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-6xl mx-4 w-full overflow-y-auto max-h-[90vh]">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">Skills & Technologies</h2>
+
+      <!-- Game Engines - Circular Progress Rings -->
+      <div class="mb-12">
+        <h3 class="text-xl md:text-2xl font-semibold mb-6 text-gray-300">Game Engines</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
+          <!-- Unreal Engine -->
+          <div class="flex flex-col items-center">
+            <svg class="circular-progress" width="140" height="140">
+              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="10"/>
+              <circle class="circular-progress-ring" cx="70" cy="70" r="60" fill="none" stroke="white" stroke-width="10" data-percent="85"/>
+            </svg>
+            <p class="mt-4 text-lg font-medium">Unreal Engine</p>
+            <p class="text-sm text-gray-400">85%</p>
+          </div>
+          <!-- Unity -->
+          <div class="flex flex-col items-center">
+            <svg class="circular-progress" width="140" height="140">
+              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="10"/>
+              <circle class="circular-progress-ring" cx="70" cy="70" r="60" fill="none" stroke="white" stroke-width="10" data-percent="75"/>
+            </svg>
+            <p class="mt-4 text-lg font-medium">Unity</p>
+            <p class="text-sm text-gray-400">75%</p>
+          </div>
+          <!-- Godot -->
+          <div class="flex flex-col items-center">
+            <svg class="circular-progress" width="140" height="140">
+              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="10"/>
+              <circle class="circular-progress-ring" cx="70" cy="70" r="60" fill="none" stroke="white" stroke-width="10" data-percent="60"/>
+            </svg>
+            <p class="mt-4 text-lg font-medium">Godot</p>
+            <p class="text-sm text-gray-400">60%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Programming - Horizontal Bars -->
+      <div class="mb-12">
+        <h3 class="text-xl md:text-2xl font-semibold mb-6 text-gray-300">Programming</h3>
+        <div class="space-y-4">
+          <!-- C++ -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">C++</span>
+              <span class="text-sm text-gray-400">80%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="80"></div>
+            </div>
+          </div>
+          <!-- C# -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">C#</span>
+              <span class="text-sm text-gray-400">85%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="85"></div>
+            </div>
+          </div>
+          <!-- Python -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">Python</span>
+              <span class="text-sm text-gray-400">70%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="70"></div>
+            </div>
+          </div>
+          <!-- JavaScript -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">JavaScript</span>
+              <span class="text-sm text-gray-400">75%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="75"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Skills - Horizontal Bars -->
+      <div>
+        <h3 class="text-xl md:text-2xl font-semibold mb-6 text-gray-300">Technical Skills</h3>
+        <div class="space-y-4">
+          <!-- 3D Modeling -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">3D Modeling</span>
+              <span class="text-sm text-gray-400">65%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="65"></div>
+            </div>
+          </div>
+          <!-- Shader Programming -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">Shader Programming</span>
+              <span class="text-sm text-gray-400">70%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="70"></div>
+            </div>
+          </div>
+          <!-- Game Design -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">Game Design</span>
+              <span class="text-sm text-gray-400">80%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="80"></div>
+            </div>
+          </div>
+          <!-- IOT Integration -->
+          <div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm md:text-base">IOT Integration</span>
+              <span class="text-sm text-gray-400">60%</span>
+            </div>
+            <div class="w-full h-6 bg-gray-800 rounded-full overflow-hidden">
+              <div class="skill-bar-fill h-full bg-gradient-to-r from-white to-gray-300" data-percent="60"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 4: EXPERIENCE ========== -->
+  <section id="experience" class="section below" data-index="3">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-5xl mx-4 w-full overflow-y-auto max-h-[90vh]">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">Experience</h2>
+
+      <!-- Timeline -->
+      <div class="relative">
+        <!-- Vertical line -->
+        <div class="absolute left-0 md:left-8 top-0 bottom-0 w-0.5 bg-gray-700"></div>
+
+        <!-- Experience Entry 1 -->
+        <div class="relative pl-8 md:pl-24 pb-12">
+          <div class="absolute left-0 md:left-8 top-2 w-4 h-4 bg-white rounded-full transform -translate-x-[7px]"></div>
+          <div class="glass p-6">
+            <h3 class="text-xl md:text-2xl font-bold mb-2">[Company Name 1]</h3>
+            <p class="text-lg text-gray-300 mb-2">[Job Title]</p>
+            <p class="text-sm text-gray-400 mb-4">[Start Date] - [End Date]</p>
+            <p class="text-sm md:text-base text-gray-300">[Brief description of responsibilities and achievements at this position. Highlight key projects, technologies used, and impact made.]</p>
+          </div>
+        </div>
+
+        <!-- Experience Entry 2 -->
+        <div class="relative pl-8 md:pl-24 pb-12">
+          <div class="absolute left-0 md:left-8 top-2 w-4 h-4 bg-white rounded-full transform -translate-x-[7px]"></div>
+          <div class="glass p-6">
+            <h3 class="text-xl md:text-2xl font-bold mb-2">[Company Name 2]</h3>
+            <p class="text-lg text-gray-300 mb-2">[Job Title]</p>
+            <p class="text-sm text-gray-400 mb-4">[Start Date] - [End Date]</p>
+            <p class="text-sm md:text-base text-gray-300">[Brief description of responsibilities and achievements at this position. Highlight key projects, technologies used, and impact made.]</p>
+          </div>
+        </div>
+
+        <!-- Experience Entry 3 -->
+        <div class="relative pl-8 md:pl-24">
+          <div class="absolute left-0 md:left-8 top-2 w-4 h-4 bg-white rounded-full transform -translate-x-[7px]"></div>
+          <div class="glass p-6">
+            <h3 class="text-xl md:text-2xl font-bold mb-2">[Company Name 3]</h3>
+            <p class="text-lg text-gray-300 mb-2">[Job Title]</p>
+            <p class="text-sm text-gray-400 mb-4">[Start Date] - [End Date]</p>
+            <p class="text-sm md:text-base text-gray-300">[Brief description of responsibilities and achievements at this position. Highlight key projects, technologies used, and impact made.]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 5: PROJECTS ========== -->
+  <section id="projects" class="section below" data-index="4">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-6xl mx-4 w-full overflow-y-auto max-h-[90vh]">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">Projects</h2>
+
+      <!-- Filter Buttons -->
+      <div class="flex flex-wrap justify-center gap-3 mb-8">
+        <button class="filter-btn glass px-6 py-3 text-sm md:text-base font-medium transition-all hover:bg-white/20 active" data-filter="All">All</button>
+        <button class="filter-btn glass px-6 py-3 text-sm md:text-base font-medium transition-all hover:bg-white/20" data-filter="Unreal">Unreal</button>
+        <button class="filter-btn glass px-6 py-3 text-sm md:text-base font-medium transition-all hover:bg-white/20" data-filter="Unity">Unity</button>
+        <button class="filter-btn glass px-6 py-3 text-sm md:text-base font-medium transition-all hover:bg-white/20" data-filter="Godot">Godot</button>
+        <button class="filter-btn glass px-6 py-3 text-sm md:text-base font-medium transition-all hover:bg-white/20" data-filter="IOT">IOT</button>
+      </div>
+
+      <!-- Project Carousel Container -->
+      <div class="relative">
+        <!-- Project Cards -->
+        <div id="project-carousel" class="min-h-[400px] md:min-h-[500px] relative">
+          <!-- Projects will be dynamically rendered here -->
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button id="prev-project" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 glass p-4 rounded-full hover:bg-white/20 transition-all" style="display: none;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button id="next-project" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 glass p-4 rounded-full hover:bg-white/20 transition-all" style="display: none;">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 6: CONTACT ========== -->
+  <section id="contact" class="section below" data-index="5">
+    <div class="glass p-8 md:p-12 lg:p-16 max-w-3xl mx-4">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-center">Get In Touch</h2>
+
+      <div class="space-y-6 text-gray-300">
+        <!-- Contact Info -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl">📧</span>
+            <div>
+              <p class="text-sm text-gray-400">Email</p>
+              <a href="mailto:[your.email@example.com]" class="text-base md:text-lg hover:text-white transition-colors">[your.email@example.com]</a>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <span class="text-2xl">📍</span>
+            <div>
+              <p class="text-sm text-gray-400">Location</p>
+              <p class="text-base md:text-lg">[Your City, Country]</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="pt-6 border-t border-gray-700">
+          <p class="text-sm text-gray-400 mb-4">Find me on</p>
+          <div class="flex flex-wrap gap-4">
+            <a href="[https://github.com/yourusername]" target="_blank" class="glass px-6 py-3 hover:bg-white/20 transition-all rounded-lg">
+              <span class="mr-2">🔗</span> GitHub
+            </a>
+            <a href="[https://linkedin.com/in/yourusername]" target="_blank" class="glass px-6 py-3 hover:bg-white/20 transition-all rounded-lg">
+              <span class="mr-2">🔗</span> LinkedIn
+            </a>
+            <a href="[https://twitter.com/yourusername]" target="_blank" class="glass px-6 py-3 hover:bg-white/20 transition-all rounded-lg">
+              <span class="mr-2">🔗</span> Twitter
+            </a>
+            <a href="[https://yourwebsite.com]" target="_blank" class="glass px-6 py-3 hover:bg-white/20 transition-all rounded-lg">
+              <span class="mr-2">🔗</span> Portfolio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    // ========== PROJECT DATA ==========
+    const projects = [
+      {
+        title: "[Project 1: AR Combat System]",
+        description: "[Built a real-time augmented reality combat system with advanced particle effects and physics simulation. Integrated IOT sensors for enhanced player interaction.]",
+        tags: ["Unreal", "IOT"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=AR+Combat+System",
+        link: "#"
+      },
+      {
+        title: "[Project 2: Mobile RPG]",
+        description: "[Developed a complete mobile RPG with procedural dungeon generation, inventory system, and multiplayer capabilities. Published on iOS and Android.]",
+        tags: ["Unity"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Mobile+RPG",
+        link: "#"
+      },
+      {
+        title: "[Project 3: VR Training Simulator]",
+        description: "[Created an immersive VR training simulator for industrial equipment operation. Features realistic physics and haptic feedback integration.]",
+        tags: ["Unreal"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=VR+Training",
+        link: "#"
+      },
+      {
+        title: "[Project 4: 2D Platformer]",
+        description: "[Designed and implemented a pixel-art platformer with tight controls, challenging levels, and a unique time-manipulation mechanic.]",
+        tags: ["Godot"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=2D+Platformer",
+        link: "#"
+      },
+      {
+        title: "[Project 5: Smart Home Game Controller]",
+        description: "[Engineered a custom IOT game controller using Arduino and Unity. Allows controlling games through physical smart home devices.]",
+        tags: ["Unity", "IOT"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Smart+Home+Controller",
+        link: "#"
+      },
+      {
+        title: "[Project 6: Multiplayer Battle Arena]",
+        description: "[Built a competitive multiplayer battle arena with matchmaking, player progression, and tournament systems. Supports up to 64 simultaneous players.]",
+        tags: ["Unreal"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Battle+Arena",
+        link: "#"
+      },
+      {
+        title: "[Project 7: Puzzle Game]",
+        description: "[Created an innovative puzzle game with unique mechanics combining physics and logic. Features 100+ handcrafted levels.]",
+        tags: ["Godot"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Puzzle+Game",
+        link: "#"
+      },
+      {
+        title: "[Project 8: IOT Environment Monitor]",
+        description: "[Developed a game-like interface for monitoring and controlling IOT environmental sensors in real-time with data visualization.]",
+        tags: ["Unity", "IOT"],
+        image: "https://via.placeholder.com/600x400/1a1a1a/ffffff?text=IOT+Monitor",
+        link: "#"
+      }
+    ];
+
+    // ========== STATE MANAGEMENT ==========
+    let currentSectionIndex = 0;
+    let isTransitioning = false;
+    let currentFilterCategory = "All";
+    let filteredProjects = [...projects];
+    let currentProjectIndex = 0;
+    let skillsAnimated = false;
+
+    const sections = document.querySelectorAll('.section');
+    const totalSections = sections.length;
+
+    // ========== SECTION NAVIGATION ==========
+    function goToSection(targetIndex) {
+      if (isTransitioning || targetIndex < 0 || targetIndex >= totalSections || targetIndex === currentSectionIndex) {
+        return;
+      }
+
+      isTransitioning = true;
+
+      // Update section positions
+      sections.forEach((section, index) => {
+        section.classList.remove('active', 'above', 'below');
+        if (index === targetIndex) {
+          section.classList.add('active');
+        } else if (index < targetIndex) {
+          section.classList.add('above');
+        } else {
+          section.classList.add('below');
+        }
+      });
+
+      currentSectionIndex = targetIndex;
+
+      // Update navigation indicators
+      updateNavigationIndicators();
+
+      // Trigger skills animation when entering skills section
+      if (currentSectionIndex === 2 && !skillsAnimated) {
+        setTimeout(() => animateSkills(), 400);
+      }
+
+      // Unlock navigation after transition
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 800);
+    }
+
+    function nextSection() {
+      if (currentSectionIndex < totalSections - 1) {
+        goToSection(currentSectionIndex + 1);
+      }
+    }
+
+    function previousSection() {
+      if (currentSectionIndex > 0) {
+        goToSection(currentSectionIndex - 1);
+      }
+    }
+
+    // ========== NAVIGATION INDICATORS ==========
+    function updateNavigationIndicators() {
+      // Update scroll indicator dots
+      document.querySelectorAll('.scroll-dot').forEach((dot, index) => {
+        if (index === currentSectionIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+
+      // Update gear menu links
+      document.querySelectorAll('.gear-link').forEach((link, index) => {
+        if (index === currentSectionIndex) {
+          link.classList.add('active-section');
+        } else {
+          link.classList.remove('active-section');
+        }
+      });
+    }
+
+    // ========== WHEEL NAVIGATION ==========
+    let wheelTimeout;
+    window.addEventListener('wheel', (e) => {
+      if (isTransitioning) return;
+
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        if (e.deltaY > 0) {
+          nextSection();
+        } else if (e.deltaY < 0) {
+          previousSection();
+        }
+      }, 50);
+    }, { passive: true });
+
+    // ========== TOUCH NAVIGATION ==========
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (isTransitioning) return;
+
+      touchEndY = e.changedTouches[0].screenY;
+      const swipeDistance = touchStartY - touchEndY;
+
+      if (Math.abs(swipeDistance) > 50) {
+        if (swipeDistance > 0) {
+          nextSection();
+        } else {
+          previousSection();
+        }
+      }
+    }, { passive: true });
+
+    // ========== GEAR MENU ==========
+    const gearMenu = document.getElementById('gear-menu');
+    const gearIcon = gearMenu.querySelector('.gear-icon');
+    const gearLinks = gearMenu.querySelector('.gear-links');
+    let gearMenuOpen = false;
+    let gearMenuTimeout;
+
+    // Desktop hover
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      gearMenu.addEventListener('mouseenter', () => {
+        clearTimeout(gearMenuTimeout);
+        gearMenuOpen = true;
+        gearLinks.classList.add('active');
+        gearIcon.classList.add('spinning');
+      });
+
+      gearMenu.addEventListener('mouseleave', () => {
+        gearMenuTimeout = setTimeout(() => {
+          gearMenuOpen = false;
+          gearLinks.classList.remove('active');
+          gearIcon.classList.remove('spinning');
+        }, 200);
+      });
+    }
+    // Mobile tap
+    else {
+      gearIcon.addEventListener('click', () => {
+        gearMenuOpen = !gearMenuOpen;
+        if (gearMenuOpen) {
+          gearLinks.classList.add('active');
+          gearIcon.classList.add('spinning');
+        } else {
+          gearLinks.classList.remove('active');
+          gearIcon.classList.remove('spinning');
+        }
+      });
+
+      // Close on tap outside
+      document.addEventListener('click', (e) => {
+        if (gearMenuOpen && !gearMenu.contains(e.target)) {
+          gearMenuOpen = false;
+          gearLinks.classList.remove('active');
+          gearIcon.classList.remove('spinning');
+        }
+      });
+    }
+
+    // Gear link clicks
+    document.querySelectorAll('.gear-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const sectionIndex = parseInt(link.dataset.section);
+        goToSection(sectionIndex);
+
+        // Close menu on mobile
+        if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+          gearMenuOpen = false;
+          gearLinks.classList.remove('active');
+          gearIcon.classList.remove('spinning');
+        }
+      });
+    });
+
+    // ========== SCROLL INDICATOR ==========
+    document.querySelectorAll('.scroll-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const sectionIndex = parseInt(dot.dataset.section);
+        goToSection(sectionIndex);
+      });
+    });
+
+    // ========== SKILLS ANIMATION ==========
+    function animateSkills() {
+      if (skillsAnimated) return;
+      skillsAnimated = true;
+
+      // Animate circular progress rings
+      document.querySelectorAll('.circular-progress-ring').forEach(ring => {
+        const percent = parseInt(ring.dataset.percent);
+        const circumference = 2 * Math.PI * 60; // radius is 60
+        const offset = circumference - (percent / 100) * circumference;
+        ring.style.setProperty('--target-offset', offset);
+        ring.classList.add('animated');
+      });
+
+      // Animate horizontal skill bars
+      document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+        const percent = parseInt(bar.dataset.percent);
+        bar.style.setProperty('--target-width', `${percent}%`);
+        bar.classList.add('animated');
+      });
+    }
+
+    // ========== PROJECT CAROUSEL ==========
+    function filterProjects(category) {
+      currentFilterCategory = category;
+
+      if (category === "All") {
+        filteredProjects = [...projects];
+      } else {
+        filteredProjects = projects.filter(project => project.tags.includes(category));
+      }
+
+      currentProjectIndex = 0;
+      renderProject();
+      updateCarouselNavigation();
+
+      // Update active filter button
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.filter === category) {
+          btn.classList.add('active');
+          btn.style.background = 'rgba(255, 255, 255, 0.2)';
+        } else {
+          btn.classList.remove('active');
+          btn.style.background = '';
+        }
+      });
+    }
+
+    function renderProject() {
+      const carousel = document.getElementById('project-carousel');
+
+      if (filteredProjects.length === 0) {
+        carousel.innerHTML = '<div class="glass p-8 text-center"><p class="text-xl text-gray-300">No projects found for this category.</p></div>';
+        return;
+      }
+
+      const project = filteredProjects[currentProjectIndex];
+      carousel.innerHTML = `
+        <div class="project-card glass p-6 md:p-8">
+          <img src="${project.image}" alt="${project.title}" class="w-full h-48 md:h-64 object-cover rounded-lg mb-6">
+          <h3 class="text-2xl md:text-3xl font-bold mb-4">${project.title}</h3>
+          <p class="text-sm md:text-base text-gray-300 mb-4">${project.description}</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            ${project.tags.map(tag => `<span class="glass px-3 py-1 text-xs md:text-sm">${tag}</span>`).join('')}
+          </div>
+          ${project.link !== '#' ? `<a href="${project.link}" target="_blank" class="inline-block glass px-6 py-3 hover:bg-white/20 transition-all rounded-lg">View Project →</a>` : ''}
+        </div>
+      `;
+
+      // Trigger animation
+      setTimeout(() => {
+        carousel.querySelector('.project-card').classList.add('visible');
+      }, 50);
+    }
+
+    function nextProject() {
+      if (currentProjectIndex < filteredProjects.length - 1) {
+        currentProjectIndex++;
+        renderProject();
+        updateCarouselNavigation();
+      }
+    }
+
+    function previousProject() {
+      if (currentProjectIndex > 0) {
+        currentProjectIndex--;
+        renderProject();
+        updateCarouselNavigation();
+      }
+    }
+
+    function updateCarouselNavigation() {
+      const prevBtn = document.getElementById('prev-project');
+      const nextBtn = document.getElementById('next-project');
+
+      if (filteredProjects.length <= 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        return;
+      }
+
+      prevBtn.style.display = currentProjectIndex === 0 ? 'none' : 'block';
+      nextBtn.style.display = currentProjectIndex === filteredProjects.length - 1 ? 'none' : 'block';
+    }
+
+    // Filter button clicks
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterProjects(btn.dataset.filter);
+      });
+    });
+
+    // Carousel navigation
+    document.getElementById('prev-project').addEventListener('click', previousProject);
+    document.getElementById('next-project').addEventListener('click', nextProject);
+
+    // Initialize project carousel
+    filterProjects('All');
+
+    // ========== CUSTOM BLOB CURSOR ==========
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      const cursor = document.getElementById('custom-cursor');
+      let cursorX = 0;
+      let cursorY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        cursorX = e.clientX;
+        cursorY = e.clientY;
+      });
+
+      function animateCursor() {
+        const diffX = cursorX - currentX;
+        const diffY = cursorY - currentY;
+
+        currentX += diffX * 0.15;
+        currentY += diffY * 0.15;
+
+        cursor.style.transform = `translate(${currentX - 50}px, ${currentY - 50}px)`;
+
+        requestAnimationFrame(animateCursor);
+      }
+
+      animateCursor();
+
+      // Hide cursor when leaving window
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+      });
+
+      document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '1';
+      });
+    }
+
+    // ========== GLITCH ANIMATION TRIGGER ==========
+    function triggerGlitch() {
+      const devElement = document.querySelector('.dev');
+      if (devElement) {
+        devElement.classList.add('glitch');
+        setTimeout(() => {
+          devElement.classList.remove('glitch');
+        }, 1000);
+      }
+    }
+
+    // Trigger glitch every 3-5 seconds
+    setInterval(() => {
+      triggerGlitch();
+    }, Math.random() * 2000 + 3000);
+
+    // ========== INITIALIZE ==========
+    updateNavigationIndicators();
+  </script>
+
+</body>
+</html>
